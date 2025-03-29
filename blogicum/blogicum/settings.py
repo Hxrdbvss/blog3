@@ -9,8 +9,9 @@ STATICFILES_DIRS = [BASE_DIR / 'static',]
 
 # Прочие настройки
 SECRET_KEY = 'django-insecure-3@l&wu*-kppk%-j3)1+@#q&ye@-rfn=8d@l%d^$a@%m)3)7*4s'
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = False
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+CSRF_FAILURE_VIEW = 'blogicum.urls.csrf_failure_view'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -21,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pages',
     'blog',
+    'django_bootstrap5'
 ]
 
 MIDDLEWARE = [
