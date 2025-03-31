@@ -33,7 +33,7 @@ def register(request):
             return redirect('blog:index')
     else:
         form = RegistrationForm()
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'registration/registration_form.html', {'form': form})
 
 def post_detail(request, id):
     post = get_object_or_404(Post.objects.filter(
@@ -127,20 +127,7 @@ def add_comment(request, post_id):
         form = CommentForm()
     return render(request, 'blog/comment.html', {'post': post, 'form': form})
 
-@login_required
-def edit_comment(request, post_id, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
-    if comment.author != request.user:
-        return redirect('blog:post_detail', id=post_id)
-    
-    if request.method == 'POST':
-        form = CommentForm(request.POST, instance=comment)
-        if form.is_valid():
-            form.save()
-            return redirect('blog:post_detail', id=post_id)
-    else:
-        form = CommentForm(instance=comment)
-    return render(request, 'blog/comment.html', {'post': comment.post, 'form': form, 'comment': comment})
+
 
 @login_required
 def edit_post(request, post_id):
@@ -171,19 +158,27 @@ def delete_post(request, post_id):
         form = PostForm(instance=post)  # Форма нужна для отображения данных в шаблоне
     return render(request, 'blog/create_post.html', {'form': form})
 
+@login_required
+def edit_comment(request, post_id, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('blog:post_detail', id=post_id)
+    else:
+        form = CommentForm(instance=comment)
+        print(f"delete_comment GET status for {request.user.username}: 200")
+    return render(request, 'blog/comment.html', {'post': comment.post, 'form': form, 'comment': comment})
 
 @login_required
 def delete_comment(request, post_id, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
-    if comment.author != request.user:
-        return redirect('blog:post_detail', id=post_id)
-    
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
     if request.method == 'POST':
         comment.delete()
         return redirect('blog:post_detail', id=post_id)
-    else:
-        form = CommentForm(instance=comment)
-    return render(request, 'blog/comment.html', {'post': comment.post, 'form': form, 'comment': comment})
+        print(f"delete_comment GET status for {request.user.username}: 200")
+    return render(request, 'blog/comment.html', {'comment': comment})
 
 # Новые CBV для статичных страниц
 class PageDetailView(DetailView):
