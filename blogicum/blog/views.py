@@ -35,8 +35,9 @@ def post_detail(request, id):
         pub_date__lte=timezone.now(),
         category__is_published=True
     ), id=id)
+    comments = post.comments.all().order_by('created_at')
     form = CommentForm()
-    return render(request, 'blog/detail.html', {'post': post, 'form': form})
+    return render(request, 'blog/detail.html', {'post': post, 'comments': comments, 'form': form})
 
 def category_posts(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug, is_published=True)
@@ -108,7 +109,22 @@ def add_comment(request, post_id):
             return redirect('blog:post_detail', id=post.id)
     else:
         form = CommentForm()
-    return render(request, 'blog/post_detail.html', {'post': post, 'form': form})
+    return render(request, 'blog/comment.html', {'post': post, 'form': form})
+
+@login_required
+def edit_comment(request, post_id, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+    if comment.author != request.user:
+        return redirect('blog:post_detail', id=post_id)
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('blog:post_detail', id=post_id)
+    else:
+        form = CommentForm(instance=comment)
+    return render(request, 'blog/comment.html', {'post': comment.post, 'form': form, 'comment': comment})
 
 @login_required
 def edit_post(request, post_id):
@@ -138,3 +154,17 @@ def delete_post(request, post_id):
     else:
         form = PostForm(instance=post)  # Форма нужна для отображения данных в шаблоне
     return render(request, 'blog/create_post.html', {'form': form})
+
+
+@login_required
+def delete_comment(request, post_id, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+    if comment.author != request.user:
+        return redirect('blog:post_detail', id=post_id)
+    
+    if request.method == 'POST':
+        comment.delete()
+        return redirect('blog:post_detail', id=post_id)
+    else:
+        form = CommentForm(instance=comment)
+    return render(request, 'blog/comment.html', {'post': comment.post, 'form': form, 'comment': comment})
