@@ -24,3 +24,8 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'text', 'author', 'category', 'location', 'image', 'is_published', 'pub_date']  # Добавляем location и pub_date
+
+class PageForm(forms.ModelForm):
+    class Meta:
+        model = Page
+        fields = ['title', 'content', 'slug', 'is_published']

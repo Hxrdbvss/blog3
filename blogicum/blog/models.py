@@ -59,3 +59,19 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Комментарий от {self.author} к {self.post.title}'
+
+
+class Page(models.Model):
+    title = models.CharField(max_length=256, verbose_name='Заголовок')
+    content = models.TextField(verbose_name='Содержание')
+    slug = models.SlugField(unique=True, verbose_name='Идентификатор', help_text='Уникальный URL-адрес страницы.')
+    is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
+
+    class Meta:
+        verbose_name = 'страница'
+        verbose_name_plural = 'Страницы'
+
+    def __str__(self):
+        return self.title

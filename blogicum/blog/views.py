@@ -3,8 +3,12 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.core.paginator import Paginator
-from .models import Category, Post, Comment
-from .forms import RegistrationForm, ProfileForm, CommentForm, PostForm
+from django.views.generic import DetailView, CreateView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.db.models import Count
+from .models import Category, Post, Comment, Page
+from .forms import RegistrationForm, ProfileForm, CommentForm, PostForm, PageForm
 from django.contrib.auth.models import User
 
 def index(request):
@@ -168,3 +172,33 @@ def delete_comment(request, post_id, comment_id):
     else:
         form = CommentForm(instance=comment)
     return render(request, 'blog/comment.html', {'post': comment.post, 'form': form, 'comment': comment})
+
+# Новые CBV для статичных страниц
+class PageDetailView(DetailView):
+    model = Page
+    template_name = 'blog/page_detail.html'
+    context_object_name = 'page'
+
+    def get_queryset(self):
+        return Page.objects.filter(is_published=True)
+
+class PageCreateView(LoginRequiredMixin, CreateView):
+    model = Page
+    form_class = PageForm
+    template_name = 'blog/page_form.html'
+    success_url = reverse_lazy('blog:index')
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+class PageUpdateView(LoginRequiredMixin, UpdateView):
+    model = Page
+    form_class = PageForm
+    template_name = 'blog/page_form.html'
+
+    def get_queryset(self):
+        return Page.objects.filter(author=self.request.user)
+
+    def get_success_url(self):
+        return reverse_lazy('blog:page_detail', kwargs={'slug': self.object.slug})

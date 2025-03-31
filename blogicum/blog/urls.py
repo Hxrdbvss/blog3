@@ -16,4 +16,8 @@ urlpatterns = [
     path('posts/<int:post_id>/delete/', delete_post, name='delete_post'),
     path('posts/<int:post_id>/edit_comment/<int:comment_id>/', edit_comment, name='edit_comment'),
     path('posts/<int:post_id>/delete_comment/<int:comment_id>/', delete_comment, name='delete_comment'),
+    # Статичные страницы
+    path('pages/<slug:slug>/', views.PageDetailView.as_view(), name='page_detail'),
+    path('pages/create/', views.PageCreateView.as_view(), name='page_create'),
+    path('pages/<slug:slug>/edit/', views.PageUpdateView.as_view(), name='page_edit'),
 ]   
