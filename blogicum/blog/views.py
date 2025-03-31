@@ -125,3 +125,16 @@ def edit_post(request, post_id):
     else:
         form = PostForm(instance=post)
     return render(request, 'blog/create_post.html', {'form': form})
+
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if post.author != request.user:
+        return redirect('blog:post_detail', id=post.id)
+    
+    if request.method == 'POST':
+        post.delete()
+        return redirect('blog:index')  # Перенаправление на главную после удаления
+    else:
+        form = PostForm(instance=post)  # Форма нужна для отображения данных в шаблоне
+    return render(request, 'blog/create_post.html', {'form': form})
