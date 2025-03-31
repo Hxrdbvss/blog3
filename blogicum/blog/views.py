@@ -10,13 +10,15 @@ from django.db.models import Count
 from .models import Category, Post, Comment, Page
 from .forms import RegistrationForm, ProfileForm, CommentForm, PostForm, PageForm
 from django.contrib.auth.models import User
+from django.core.mail import send_mail  
+from django.conf import settings
 
 def index(request):
     post_list = Post.objects.filter(
         is_published=True,
         pub_date__lte=timezone.now(),
         category__is_published=True
-    ).order_by('-pub_date')
+    ).annotate(comment_count=Count('comments')).order_by('-pub_date')
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -49,7 +51,7 @@ def category_posts(request, category_slug):
         category=category,
         is_published=True,
         pub_date__lte=timezone.now()
-    ).order_by('-pub_date')
+    ).annotate(comment_count=Count('comments')).order_by('-pub_date')
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -60,20 +62,23 @@ def category_posts(request, category_slug):
 
 def profile(request, username):
     profile = get_object_or_404(User, username=username)
-    post_list = Post.objects.filter(
-        author=profile,
-        is_published=True,
-        pub_date__lte=timezone.now(),
-        category__is_published=True
-    ).order_by('-pub_date')
+    # Базовый запрос для постов
+    post_list = Post.objects.filter(author=profile)
+    
+    # Если это не автор, фильтруем только опубликованные посты
+    if request.user != profile:
+        post_list = post_list.filter(
+            is_published=True,
+            pub_date__lte=timezone.now(),
+            category__is_published=True
+        )
+    
+    # Добавляем аннотацию и сортировку
+    post_list = post_list.annotate(comment_count=Count('comments')).order_by('-pub_date')
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    context = {
-        'profile': profile,
-        'page_obj': page_obj,
-    }
-    return render(request, 'blog/profile.html', context)
+    return render(request, 'blog/profile.html', {'profile': profile, 'page_obj': page_obj})
 
 @login_required
 def edit_profile(request):
@@ -202,3 +207,22 @@ class PageUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('blog:page_detail', kwargs={'slug': self.object.slug})
+
+@login_required
+def create_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            # Отправка письма
+            subject = f'Новый пост: {post.title}'
+            message = f'Пользователь {request.user.username} создал пост "{post.title}".'
+            from_email = settings.EMAIL_HOST_USER or 'noreply@blogicum.com'
+            recipient_list = [request.user.email]  # Отправляем автору
+            send_mail(subject, message, from_email, recipient_list)
+            return redirect('blog:index')
+    else:
+        form = PostForm()
+    return render(request, 'blog/create_post.html', {'form': form})
