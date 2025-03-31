@@ -96,7 +96,6 @@ def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if post.author != request.user:
         return redirect('blog:post_detail', id=post.id)
-    
     if request.method == 'POST':
         post.delete()
         return redirect('blog:profile', username=request.user.username)  # Перенаправление на главную после удаления
@@ -121,10 +120,7 @@ def add_comment(request, post_id):
 
 @login_required
 def edit_comment(request, post_id, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
-    if comment.author != request.user:
-        return redirect('blog:post_detail', id=post_id)
-    
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
     if request.method == 'POST':
         form = CommentForm(request.POST, instance=comment)
         if form.is_valid():
@@ -132,12 +128,11 @@ def edit_comment(request, post_id, comment_id):
             return redirect('blog:post_detail', id=post_id)
     else:
         form = CommentForm(instance=comment)
-    return render(request, 'blog/comment.html', {'post': comment.post, 'form': form, 'comment': comment})
+    return render(request, 'blog/comment.html', {'form': form, 'comment': comment})
 
 @login_required
 def edit_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    # Проверяем, что текущий пользователь — автор поста
     if post.author != request.user:
         return redirect('blog:post_detail', id=post.id)
     
@@ -150,22 +145,13 @@ def edit_post(request, post_id):
         form = PostForm(instance=post)
     return render(request, 'blog/create_post.html', {'form': form})
 
-
-
-
-
 @login_required
 def delete_comment(request, post_id, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
-    if comment.author != request.user:
-        return redirect('blog:post_detail', id=post_id)
-    
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
     if request.method == 'POST':
         comment.delete()
         return redirect('blog:post_detail', id=post_id)
-    else:
-        form = CommentForm(instance=comment)
-    return render(request, 'blog/comment.html', {'post': comment.post, 'form': form, 'comment': comment})
+    return render(request, 'blog/comment.html', {'comment': comment})
 
 # Новые CBV для статичных страниц
 class PageDetailView(DetailView):
