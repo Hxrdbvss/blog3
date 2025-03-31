@@ -9,7 +9,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static',]
 
 # Прочие настройки
 SECRET_KEY = 'django-insecure-3@l&wu*-kppk%-j3)1+@#q&ye@-rfn=8d@l%d^$a@%m)3)7*4s'
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 CSRF_FAILURE_VIEW = 'blogicum.urls.csrf_failure_view'
 
@@ -83,4 +83,11 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
 
+# Медиафайлы
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# В конец файла settings.py
+LOGIN_REDIRECT_URL = '/'  # После логина — на главную
+LOGOUT_REDIRECT_URL = '/'  # После логаута — на главную

@@ -1,34 +1,127 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import Category, Post
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
+from django.core.paginator import Paginator
+from .models import Category, Post, Comment
+from .forms import RegistrationForm, ProfileForm, CommentForm, PostForm
+from django.contrib.auth.models import User
 
 def index(request):
-    # Главная страница: 5 последних публикаций с фильтрами
     post_list = Post.objects.filter(
-        is_published=True,                  # Публикация опубликована
-        pub_date__lte=timezone.now(),       # Дата публикации не позже текущего времени
-        category__is_published=True         # Категория опубликована
-    ).order_by('-pub_date')[:5]             # Сортировка по убыванию даты, первые 5
-    return render(request, 'blog/index.html', {'post_list': post_list})
+        is_published=True,
+        pub_date__lte=timezone.now(),
+        category__is_published=True
+    ).order_by('-pub_date')
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'blog/index.html', {'page_obj': page_obj})
+
+def register(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('blog:index')
+    else:
+        form = RegistrationForm()
+    return render(request, 'registration/register.html', {'form': form})
 
 def post_detail(request, id):
-    # Страница отдельной публикации с фильтрами и ошибкой 404
     post = get_object_or_404(Post.objects.filter(
-        is_published=True,                  # Публикация опубликована
-        pub_date__lte=timezone.now(),       # Дата публикации не позже текущего времени
-        category__is_published=True         # Категория опубликована
-    ), id=id)                               # Фильтр по первичному ключу
-    return render(request, 'blog/detail.html', {'post': post})
+        is_published=True,
+        pub_date__lte=timezone.now(),
+        category__is_published=True
+    ), id=id)
+    form = CommentForm()
+    return render(request, 'blog/detail.html', {'post': post, 'form': form})
 
 def category_posts(request, category_slug):
-    # Страница категории: посты с фильтрами и ошибка 404 для неопубликованной категории
     category = get_object_or_404(Category, slug=category_slug, is_published=True)
     post_list = Post.objects.filter(
-        category=category,                  # Принадлежит выбранной категории
-        is_published=True,                  # Публикация опубликована
-        pub_date__lte=timezone.now()        # Дата публикации не позже текущего времени
-    ).order_by('-pub_date')                 # Сортировка по убыванию даты
+        category=category,
+        is_published=True,
+        pub_date__lte=timezone.now()
+    ).order_by('-pub_date')
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     return render(request, 'blog/category.html', {
         'category': category,
-        'post_list': post_list
+        'page_obj': page_obj
     })
+
+def profile(request, username):
+    profile = get_object_or_404(User, username=username)
+    post_list = Post.objects.filter(
+        author=profile,
+        is_published=True,
+        pub_date__lte=timezone.now(),
+        category__is_published=True
+    ).order_by('-pub_date')
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'profile': profile,
+        'page_obj': page_obj,
+    }
+    return render(request, 'blog/profile.html', context)
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('blog:profile', username=request.user.username)
+    else:
+        form = ProfileForm(instance=request.user)
+    return render(request, 'blog/edit_profile.html', {'form': form})
+
+@login_required
+def create_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)  # Добавляем request.FILES для изображений
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.pub_date = timezone.now()
+            post.save()
+            return redirect('blog:index')
+    else:
+        form = PostForm()
+    return render(request, 'blog/create_post.html', {'form': form})
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect('blog:post_detail', id=post.id)
+    else:
+        form = CommentForm()
+    return render(request, 'blog/post_detail.html', {'post': post, 'form': form})
+
+@login_required
+def edit_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    # Проверяем, что текущий пользователь — автор поста
+    if post.author != request.user:
+        return redirect('blog:post_detail', id=post.id)
+    
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('blog:post_detail', id=post.id)
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/create_post.html', {'form': form})
