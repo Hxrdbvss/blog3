@@ -33,7 +33,7 @@ def register(request):
             return redirect('blog:index')
     else:
         form = RegistrationForm()
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'registration/registration_form.html', {'form': form})
 
 def post_detail(request, id):
     post = get_object_or_404(Post.objects.filter(
@@ -92,25 +92,17 @@ def edit_profile(request):
     return render(request, 'blog/edit_profile.html', {'form': form})
 
 @login_required
-def create_post(request):
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if post.author != request.user:
+        return redirect('blog:post_detail', id=post.id)
+    
     if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            # Отправка письма
-            subject = f'Новый пост: {post.title}'
-            message = f'Пользователь {request.user.username} создал пост "{post.title}".'
-            from_email = settings.EMAIL_HOST_USER or 'noreply@blogicum.com'
-            recipient_list = [request.user.email]
-            send_mail(subject, message, from_email, recipient_list)
-            return redirect('blog:profile', username=request.user.username)  # Редирект на профиль
-        else:
-            return render(request, 'blog/create.html', {'form': form})
+        post.delete()
+        return redirect('blog:profile', username=request.user.username)  # Перенаправление на главную после удаления
     else:
-        form = PostForm()
-    return render(request, 'blog/create.html', {'form': form})
+        form = PostForm(instance=post)  # Форма нужна для отображения данных в шаблоне
+    return render(request, 'blog/create_post.html', {'form': form})
 
 @login_required
 def add_comment(request, post_id):
@@ -158,18 +150,8 @@ def edit_post(request, post_id):
         form = PostForm(instance=post)
     return render(request, 'blog/create_post.html', {'form': form})
 
-@login_required
-def delete_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    if post.author != request.user:
-        return redirect('blog:post_detail', id=post.id)
-    
-    if request.method == 'POST':
-        post.delete()
-        return redirect('blog:profile', username=request.user.username)  # Перенаправление на главную после удаления
-    else:
-        form = PostForm(instance=post)  # Форма нужна для отображения данных в шаблоне
-    return render(request, 'blog/create_post.html', {'form': form})
+
+
 
 
 @login_required
@@ -229,7 +211,8 @@ def create_post(request):
             from_email = settings.EMAIL_HOST_USER or 'noreply@blogicum.com'
             recipient_list = [request.user.email]  # Отправляем автору
             send_mail(subject, message, from_email, recipient_list)
-            return redirect('blog:index')
+            return redirect('blog:profile', username=request.user.username)
     else:
         form = PostForm()
     return render(request, 'blog/create_post.html', {'form': form})
+    
