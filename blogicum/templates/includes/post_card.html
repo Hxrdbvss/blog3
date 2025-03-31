@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div class="col d-flex justify-content-center">
   <div class="card" style="width: 40rem;">
     <div class="card-body">
@@ -23,5 +24,18 @@
       <a href="{% url 'blog:post_detail' post.id %}" class="card-link">Читать полный текст</a>
       <a href="{% url 'blog:post_detail' post.id %}" class="card-link text-muted">Комментарии ({{ post.comment_count }})</a>
     </div>
+=======
+<div class="card" style="width: 40rem;">
+  <div class="card-body">
+    <h5 class="card-title">{{ post.title }}</h5>
+    <h6 class="card-subtitle mb-2 text-muted">
+      <small>
+        {{ post.pub_date|date:"d E Y" }} | {% if post.location and post.location.is_published %}{{ post.location.name }}{% else %}Планета Земля{% endif %}<br>
+        От автора @{{ post.author.username }} в категории {% include "includes/category_link.html" %}
+      </small>
+    </h6>
+    <p class="card-text">{{ post.text|truncatewords:10 }}</p>
+    <a href="{% url 'blog:post_detail' post.id %}" class="card-link">Читать полный текст</a>
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
   </div>
 </div>

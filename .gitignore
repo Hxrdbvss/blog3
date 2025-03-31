@@ -146,7 +146,11 @@ dmypy.json
 .mypy_cache
 
 # папки со статикой и медиа
+<<<<<<< HEAD
 media/
 
 sent_emails/
 
+=======
+media/
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430

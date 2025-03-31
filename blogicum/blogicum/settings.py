@@ -10,8 +10,12 @@ STATICFILES_DIRS = [BASE_DIR / 'static',]
 # Прочие настройки
 SECRET_KEY = 'django-insecure-3@l&wu*-kppk%-j3)1+@#q&ye@-rfn=8d@l%d^$a@%m)3)7*4s'
 DEBUG = True
+<<<<<<< HEAD
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 CSRF_FAILURE_VIEW = 'pages.views.csrf_failure_view'
+=======
+ALLOWED_HOSTS = []
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,7 +26,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pages',
     'blog',
+<<<<<<< HEAD
     'django_bootstrap5'
+=======
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
 ]
 
 MIDDLEWARE = [
@@ -37,7 +44,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'blogicum.urls'
 
+<<<<<<< HEAD
 TEMPLATES_DIR = BASE_DIR / 'templates'
+=======
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
 
 TEMPLATES = [
     {
@@ -83,6 +94,7 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
 
+<<<<<<< HEAD
 # Медиафайлы
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -94,3 +106,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # В конец файла settings.py
 LOGIN_REDIRECT_URL = '/'  # После логина — на главную
 LOGOUT_REDIRECT_URL = '/'  # После логаута — на главную
+=======
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430

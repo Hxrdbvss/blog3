@@ -3,6 +3,7 @@
   <nav class="navbar navbar-light" style="background-color: lightskyblue">
     <div class="container">
       <a class="navbar-brand" href="{% url 'blog:index' %}">
+<<<<<<< HEAD
         <img src="{% static 'img/logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
         Блогикум
       </a>
@@ -10,10 +11,25 @@
         <ul class="nav nav-pills">
           <li class="nav-item">
             <a class="nav-link {% if view_name == 'pages:about' %} text-white {% endif %}" href="{% url 'pages:about' %}">
+=======
+        <img src="{% static 'images/logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
+        Блогикум
+      </a>
+      {% with request.resolver_match.view_name as view_name %}        
+        <ul class="nav  nav-pills">
+          <li class="nav-item">              
+            <a class="nav-link {% if view_name == 'blog:index' %} active {% endif %}" href="{% url 'blog:index' %}">
+              Лента записей
+            </a>
+          </li>
+          <li class="nav-item">              
+            <a class="nav-link {% if view_name == 'pages:about' %} active {% endif %}" href="{% url 'pages:about' %}">
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
               О проекте
             </a>
           </li>
           <li class="nav-item">
+<<<<<<< HEAD
             <a class="nav-link {% if view_name == 'pages:rules' %} text-white {% endif %}" href="{% url 'pages:rules' %}">
               Правила
             </a>
@@ -44,4 +60,14 @@
       {% endwith %}
     </div>
   </nav>
+=======
+            <a class="nav-link {% if view_name == 'pages:rules' %} active {% endif %}" href="{% url 'pages:rules' %}">
+              Наши правила
+            </a>
+          </li>
+        </ul>
+      {% endwith %}      
+    </div>
+  </nav> 
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
 </header>

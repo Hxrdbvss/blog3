@@ -1,4 +1,5 @@
 from django.shortcuts import render
+<<<<<<< HEAD
 from django.views.generic import TemplateView
 
 class AboutPageView(TemplateView):
@@ -18,3 +19,15 @@ def csrf_failure_view(request, reason=""):
 # Обработчик для 500
 def handler500(request):
     return render(request, 'pages/500.html', status=500)
+=======
+
+def index(request):
+    context = {"posts": posts}
+    return render(request, "blog/index.html", context)
+
+def about(request):
+    return render(request, 'pages/about.html')
+
+def rules(request):
+    return render(request, 'pages/rules.html')
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430

@@ -4,9 +4,24 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Location(models.Model):
+<<<<<<< HEAD
     name = models.CharField(max_length=256, verbose_name='Название места')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Добавлено')
+=======
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Название места'
+    )
+    is_published = models.BooleanField(
+        default=True,
+        verbose_name='Опубликовано'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Добавлено'
+    )
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
 
     class Meta:
         verbose_name = 'местоположение'
@@ -16,11 +31,35 @@ class Location(models.Model):
         return self.name
 
 class Category(models.Model):
+<<<<<<< HEAD
     title = models.CharField(max_length=256, verbose_name='Заголовок')
     description = models.TextField(verbose_name='Описание')
     slug = models.SlugField(unique=True, verbose_name='Идентификатор', help_text='Идентификатор страницы для URL; разрешены символы латиницы, цифры, дефис и подчёркивание.')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано', help_text='Снимите галочку, чтобы скрыть публикацию.')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Добавлено')
+=======
+    title = models.CharField(
+        max_length=256,
+        verbose_name='Заголовок'
+    )
+    description = models.TextField(
+        verbose_name='Описание'
+    )
+    slug = models.SlugField(
+        unique=True,
+        verbose_name='Идентификатор',
+        help_text='Идентификатор страницы для URL; разрешены символы латиницы, цифры, дефис и подчёркивание.'
+    )
+    is_published = models.BooleanField(
+        default=True,
+        verbose_name='Опубликовано',
+        help_text='Снимите галочку, чтобы скрыть публикацию.'  # Добавлено
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Добавлено'
+    )
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
 
     class Meta:
         verbose_name = 'категория'
@@ -30,6 +69,7 @@ class Category(models.Model):
         return self.title
 
 class Post(models.Model):
+<<<<<<< HEAD
     title = models.CharField(max_length=256, verbose_name='Заголовок')
     text = models.TextField(verbose_name='Текст')
     pub_date = models.DateTimeField(verbose_name='Дата и время публикации', help_text='Если установить дату и время в будущем — можно делать отложенные публикации.')
@@ -39,12 +79,52 @@ class Post(models.Model):
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Добавлено')
     image = models.ImageField(upload_to='post/', null=True, blank=True, verbose_name='Изображение')
+=======
+    title = models.CharField(
+        max_length=256,
+        verbose_name='Заголовок'
+    )
+    text = models.TextField(
+        verbose_name='Текст'
+    )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата и время публикации',
+        help_text='Если установить дату и время в будущем — можно делать отложенные публикации.'  # Добавлено
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Автор публикации'
+    )
+    location = models.ForeignKey(
+        Location,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Местоположение'
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='Категория'
+    )
+    is_published = models.BooleanField(
+        default=True,
+        verbose_name='Опубликовано'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Добавлено'
+    )
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
 
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
 
     def __str__(self):
+<<<<<<< HEAD
         return self.title
 
 class Comment(models.Model):
@@ -74,4 +154,6 @@ class Page(models.Model):
         verbose_name_plural = 'Страницы'
 
     def __str__(self):
+=======
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
         return self.title

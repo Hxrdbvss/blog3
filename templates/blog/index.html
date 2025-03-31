@@ -3,19 +3,10 @@
   Лента записей
 {% endblock %}
 {% block content %}
-<<<<<<< HEAD
-  {% for post in page_obj %}
-    <article class="mb-5">
-      {% include "includes/post_card.html" %}
-    </article>
-  {% endfor %}
-  {% include "includes/paginator.html" %}
-=======
   <h1 class="mb-5">Лента записей</h1>
   {% for post in post_list %}
     <article class="mb-5">  
       {% include "includes/post_card.html" %}
     </article>   
   {% endfor %}
->>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
 {% endblock %}

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}
+<<<<<<< HEAD
   {{ post.title }} | {% if post.location and post.location.is_published %}{{ post.location.name }}{% else %}Планета Земля{% endif %} |
   {{ post.pub_date|date:"d E Y" }}
 {% endblock %}
@@ -40,4 +41,15 @@
       </div>
     </div>
   </div>
+=======
+{{ post.title }} | {% if post.location and post.location.is_published %}{{ post.location.name }} |{% endif %} {{ post.pub_date|date:"d E Y" }}
+{% endblock %}
+{% block content %}
+  <article>
+    <p>{{ post.pub_date|date:"d E Y" }} | {% if post.location and post.location.is_published %}{{ post.location.name }}{% else %}Планета Земля{% endif %}<br>
+      <small>От автора @{{ post.author.username }} в категории {% include "includes/category_link.html" %}</small></p>
+    <h3>{{ post.title }}</h3>
+    <p>{{ post.text|linebreaksbr }}</p>
+  </article> 
+>>>>>>> 9589b23700b83ab030eb2dcd4a8a573bcea6f430
 {% endblock %}
