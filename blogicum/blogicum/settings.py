@@ -11,7 +11,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static',]
 SECRET_KEY = 'django-insecure-3@l&wu*-kppk%-j3)1+@#q&ye@-rfn=8d@l%d^$a@%m)3)7*4s'
 DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-CSRF_FAILURE_VIEW = 'blogicum.urls.csrf_failure_view'
+CSRF_FAILURE_VIEW = 'pages.views.csrf_failure_view'
 
 INSTALLED_APPS = [
     'django.contrib.admin',

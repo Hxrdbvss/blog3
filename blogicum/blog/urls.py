@@ -16,4 +16,4 @@ urlpatterns = [
     path('posts/<int:post_id>/delete/', delete_post, name='delete_post'),
     path('posts/<int:post_id>/edit_comment/<int:comment_id>/', edit_comment, name='edit_comment'),
     path('posts/<int:post_id>/delete_comment/<int:comment_id>/', delete_comment, name='delete_comment'),
-]   
+]  

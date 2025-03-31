@@ -38,7 +38,7 @@ class Post(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, verbose_name='Категория')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Добавлено')
-    image = models.ImageField(upload_to='post_images/', null=True, blank=True, verbose_name='Изображение')
+    image = models.ImageField(upload_to='post/', null=True, blank=True, verbose_name='Изображение')
 
     class Meta:
         verbose_name = 'публикация'

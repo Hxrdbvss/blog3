@@ -23,7 +23,7 @@ class CommentForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'text', 'author', 'category', 'location', 'image', 'is_published', 'pub_date']  # Добавляем location и pub_date
+        fields = ['title', 'text',  'category', 'location', 'image', 'is_published', 'pub_date']  # Добавляем location и pub_date
 
 class PageForm(forms.ModelForm):
     class Meta:

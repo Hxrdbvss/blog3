@@ -94,16 +94,23 @@ def edit_profile(request):
 @login_required
 def create_post(request):
     if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)  # Добавляем request.FILES для изображений
+        form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.pub_date = timezone.now()
             post.save()
-            return redirect('blog:index')
+            # Отправка письма
+            subject = f'Новый пост: {post.title}'
+            message = f'Пользователь {request.user.username} создал пост "{post.title}".'
+            from_email = settings.EMAIL_HOST_USER or 'noreply@blogicum.com'
+            recipient_list = [request.user.email]
+            send_mail(subject, message, from_email, recipient_list)
+            return redirect('blog:profile', username=request.user.username)  # Редирект на профиль
+        else:
+            return render(request, 'blog/create.html', {'form': form})
     else:
         form = PostForm()
-    return render(request, 'blog/create_post.html', {'form': form})
+    return render(request, 'blog/create.html', {'form': form})
 
 @login_required
 def add_comment(request, post_id):
@@ -159,7 +166,7 @@ def delete_post(request, post_id):
     
     if request.method == 'POST':
         post.delete()
-        return redirect('blog:index')  # Перенаправление на главную после удаления
+        return redirect('blog:profile', username=request.user.username)  # Перенаправление на главную после удаления
     else:
         form = PostForm(instance=post)  # Форма нужна для отображения данных в шаблоне
     return render(request, 'blog/create_post.html', {'form': form})
