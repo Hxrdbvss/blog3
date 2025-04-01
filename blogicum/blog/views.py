@@ -12,6 +12,7 @@ from .forms import RegistrationForm, ProfileForm, CommentForm, PostForm, PageFor
 from django.contrib.auth.models import User
 from django.core.mail import send_mail  
 from django.conf import settings
+from django.http import Http404
 
 def index(request):
     post_list = Post.objects.filter(
@@ -36,11 +37,20 @@ def register(request):
     return render(request, 'registration/registration_form.html', {'form': form})
 
 def post_detail(request, id):
-    post = get_object_or_404(Post.objects.filter(
-        is_published=True,
-        pub_date__lte=timezone.now(),
-        category__is_published=True
-    ), id=id)
+    # Получаем пост без фильтрации по is_published
+    post = get_object_or_404(Post, id=id)
+    
+    # Проверяем, опубликован ли пост
+    is_published = (
+        post.is_published
+        and post.pub_date <= timezone.now()
+        and post.category.is_published
+    )
+    
+    # Если пост не опубликован и пользователь не является автором, возвращаем 404
+    if not is_published and post.author != request.user:
+        raise Http404("Post not found or not published")
+    
     comments = post.comments.all().order_by('created_at')
     form = CommentForm()
     return render(request, 'blog/detail.html', {'post': post, 'comments': comments, 'form': form})
