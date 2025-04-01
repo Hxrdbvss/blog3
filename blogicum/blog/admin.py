@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Location, Post
+from .models import Category, Location, Post, Comment, Page
 
 # Настройка модели Category
 @admin.register(Category)
@@ -21,8 +21,7 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ('title', 'text')  # Поиск по заголовку и тексту
     fieldsets = (
         (None, {
-            'fields': ('title', 'slug', 'description', 'text', 'pub_date', 'is_published', 
-                       'author', 'category', 'location')
+            'fields': ('title', 'slug', 'description', 'text', 'pub_date', 'is_published', 'author', 'category', 'location')
         }),
     )
 
@@ -37,3 +36,17 @@ class PostAdmin(admin.ModelAdmin):
             'Если установить дату и время в будущем — можно делать отложенные публикации.'
         )
         return form
+
+# Настройка модели Comment
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('text', 'author', 'post', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('text', 'author__username', 'post__title')
+
+# Настройка модели Page
+@admin.register(Page)
+class PageAdmin(admin.ModelAdmin):
+    list_display = ('title', 'slug', 'is_published', 'author', 'created_at')
+    list_filter = ('is_published',)
+    search_fields = ('title', 'content')
